@@ -15,7 +15,7 @@ b{font-weight:normal;}
 
 /*2.添加公共样式*/
 body {
-    font:12px "宋体";
+    /*font:12px "宋体";*/
     color:#666;
 }
 
