@@ -37,7 +37,7 @@
         </section>
         <ul v-infinite-scroll="load"><!--v-infinite-scroll="load"-->
             <p>猜你喜欢</p>
-            <li v-for="(item,index) in ListData" :key="index" :GoodsId="item.id">
+            <li v-for="(item,index) in ListData" :key="index" :GoodsId="item.id" @click="ToDetail(item.id)">
                 <img :src="item.url">
                 <div>
                     <p>{{item.title}}</p>
@@ -107,6 +107,9 @@
                     },
                     type:'get'
                 })
+            },
+            ToDetail:function (id) {
+                this.$router.push(`/details/${id}`)
             }
         },
         directives: {infiniteScroll},

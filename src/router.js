@@ -11,12 +11,9 @@ export default new Router({
       name: 'home',
       component: Home
     },
-<<<<<<< HEAD
-=======
-    {
+      {
       path:'/details/:id',
       component:()=>import('./views/Details.vue')
     }
->>>>>>> 详情页完成
   ]
 })

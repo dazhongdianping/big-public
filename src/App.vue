@@ -33,6 +33,7 @@
   -moz-osx-font-smoothing: grayscale;
   display: flex;
   height: 100%;
+  font-size: 16px;
 }
 </style>
 <style scoped lang="css">

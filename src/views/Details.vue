@@ -90,12 +90,12 @@ export default {
         fn(res) {
           let data = res.data.data;
           data.forEach(item => {
-           
+
             if (item.id == that.$route.params.id) {
               that.goodsMsg = item;
             }
           })
-        
+
     }
     })
   }
@@ -107,6 +107,7 @@ export default {
 <style lang='scss' scoped>
 #details {
   background: #f0f0f0;
+  width: 320px;
 }
 .mint-swipe {
   width: 100%;
