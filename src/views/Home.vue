@@ -1,5 +1,5 @@
 <template>
-    <div class="home" style="overflow-x: hidden">
+    <div class="home" >
         <header>
             <p><img :src="img" alt="">吃喝玩乐，找优惠</p>
             <p><span>打开大众点评</span><span>下载APP享特价</span></p>
@@ -357,6 +357,7 @@
 
     .home > ul > li > div > p:nth-of-type(2) {
         font-size: 12px;
+        max-width: 180px;
     }
 
     .home > ul > li > div > p:nth-of-type(3) {
