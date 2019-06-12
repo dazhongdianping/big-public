@@ -39,7 +39,7 @@
 <style scoped lang="css">
   header{
     position: fixed;
-    width: 100%;
+    width:calc(100% - 20px);
     height:50px ;
     background: #f63;;
     padding-left: 10px;

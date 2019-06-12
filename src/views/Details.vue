@@ -80,6 +80,9 @@ export default {
   created() {
     this.getDetails();
   },
+  mounted(){
+    window.scrollTo(0,0);
+  },
   methods: {
     getDetails() {
       let that = this;
