@@ -1,11 +1,14 @@
 <template>
   <div id="details">
+    <header style="z-index: 10">
+      <span @click="ToHome"><i class="el-icon-arrow-left"></i>返回</span>
+      <label>团购详情</label>
+    </header>
     <mt-swipe :auto="4500">
       <mt-swipe-item v-for="(item,index) in goodsMsg.img" :key="index">
         <img :src="item" alt>
       </mt-swipe-item>
     </mt-swipe>
-
     <div class="cost-box">
       <div class="buy-box">
         <div class="price">¥</div>
@@ -16,7 +19,7 @@
           </div>
         </div>
         <div class="last">
-          <a href="/tuan/buy/29474879" class="buy-btn">立即购买</a>
+          <a class="buy-btn" @click="ToBuy">立即购买</a>
         </div>
       </div>
       <ul class="advantage">
@@ -32,15 +35,15 @@
     <shops-msg :title="[goodsMsg.Title,goodsMsg.place]"/>
     <bulk-details/>
     <buy-know/>
-    <a href="/tuan/buy/29474879" class="buy-now">
-      <span>立即购买</span>
+    <a  class="buy-now">
+      <span @click="ToBuy">立即购买</span>
     </a>
     <other-bulk/>
     <look-goods/>
     <footer class="footer">
       <a href="/tuan">首页</a>
       <em>|</em>
-      <a href="/tuan/receiptlist">我的点评团</a>
+      <a >我的点评团</a>
       <em>|</em>
       <a href="http://www.dianping.com/events/m/index.htm">客户端</a>
       <em>|</em>
@@ -79,12 +82,13 @@ export default {
   },
   created() {
     this.getDetails();
+    this.$store.state.headState=0
   },
   mounted(){
     window.scrollTo(0,0);
   },
   methods: {
-    getDetails() {
+    getDetails:function () {
       let that = this;
       this.$store.commit("awsl", {
         mapping:
@@ -93,21 +97,75 @@ export default {
         fn(res) {
           let data = res.data.data;
           data.forEach(item => {
-
             if (item.id == that.$route.params.id) {
-              that.goodsMsg = item;
+              that.goodsMsg = item;return
             }
           })
 
     }
     })
-  }
+  },
+    ToBuy:function () {
+      console.log(666)
+       let goodsId=this.$route.params.id;
+       this.$router.push({name:'TakeOrder',params:{id:goodsId}})
+    },
+    ToHome:function () {
+      this.$router.push('/')
+    }
+  },
+  destroyed() {
+    this.$store.state.headState=1
   }
 }
 
 </script>
 
 <style lang='scss' scoped>
+
+  /*~~~~~~~~~~~~~~~~~~*/
+  header{
+
+    width: 100%;
+    height:50px ;
+    background:  #f0f0f0;;;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: flex;
+  }
+  header>span{
+    color: #000000;
+    max-width: 60px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 50px;
+  }
+  header>label{
+    color: #000000;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 50px;
+    flex: 1;
+    text-align: left;
+    padding-left: 64px;
+  }
+  header>span>i{
+    display: inline-block;
+    font-size: 20px;
+    padding-left: 4px;
+  }
+  header>i{
+    line-height: 50px;
+    vertical-align: top;
+    display: inline-block;
+    font-size: 20px;
+    padding-left: 8px;
+    color: white;
+  }
+  /*~~~~~~~~~~~~~~~~~~*/
 #details {
   background: #f0f0f0;
   width: 320px;

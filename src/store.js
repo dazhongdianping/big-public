@@ -7,7 +7,10 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-
+      isLogin:0,
+      userName:'',
+      headState:0,
+      headStateGoBack:1
   },
   mutations: {
     awsl(state,{mapping,data,fn,type})

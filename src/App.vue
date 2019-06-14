@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <header style="z-index: 10">
-      <span>位置<i class="el-icon-arrow-down"></i></span><input type="text" placeholder="输入商品名、地点"><i class="el-icon-user"></i>
+    <header style="z-index: 10" v-if="$store.state.headState">
+      <span>广州<i class="el-icon-arrow-down"></i></span>
+      <input type="text" placeholder="输入商品名、地点"><i class="el-icon-user" @click="ToPersonMsg"></i>
     </header>
     <router-view/>
   </div>
@@ -11,14 +12,17 @@
     name:'app',
     data(){
       return{
-
       }
     },
     methods:{
+      ToPersonMsg:function () {
+
+        this.$store.state.isLogin?(this.$router.push('/PersonalMsg')):(this.$router.push('/login'))
+      }
     },
     mounted() {
 
-    }
+    },
   }
 </script>
 <style lang="scss">
@@ -39,7 +43,7 @@
 <style scoped lang="css">
   header{
     position: fixed;
-    width:calc(100% - 20px);
+    width: 100%;
     height:50px ;
     background: #f63;;
     padding-left: 10px;

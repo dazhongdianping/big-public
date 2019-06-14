@@ -82,6 +82,7 @@
         mounted() {
             this.GetData();
             this.GetData2();
+            this.ToCheck();
         },
         methods: {
             load: function () {
@@ -110,7 +111,26 @@
             },
             ToDetail:function (id) {
                 this.$router.push(`/details/${id}`)
-            }
+            },
+            ToCheck:function()
+            {
+                var cookie=document.cookie?document.cookie.split('=')[1]:0
+                console.log(document.cookie)
+                this.$store.commit('awsl',{
+                    mapping: 'http://10.3.131.41:8083/public',
+                    data:{
+                        code:'3',token:cookie
+                    },
+                    fn:(res)=>{
+                      console.log('返回的值：'+res.data)
+                        res.data!='false'
+                            ?(console.log('检验成功'),this.$store.state.isLogin=1,this.$store.state.userName=res.data)
+                            :(console.log('检验失败'))
+                    },
+                    type:'post'
+                })
+
+            },
         },
         directives: {infiniteScroll},
 

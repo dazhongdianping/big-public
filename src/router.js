@@ -24,5 +24,25 @@ export default new Router({
       name: 'logins',
       component: () => import('./views/Logins.vue')
     },
+    {
+      path: '/PersonalMsg',
+      name: 'PersonalMsg',
+      component: () => import('./views/PersonalMsg.vue')
+    },
+    {
+      path: '/TakeMsg',
+      name: 'TakeMsg',
+      component: () => import('./views/TakeMsg.vue')
+    },
+    {
+      path:'/TakeOrder',
+      name:'TakeOrder',
+      component: () => import('./views/TakeOrder.vue')
+    },
+    {
+      path:'/pay',
+      name:'pay',
+      component: () => import('./views/pay.vue')
+    }
   ]
 })

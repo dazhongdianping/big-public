@@ -12,7 +12,8 @@
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
     "element-ui": "latest",
-    "vue-infinite-scroll": "latest"
+    "vue-infinite-scroll": "latest",
+    "axios": "latest"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
