@@ -9,7 +9,7 @@ export default new Vuex.Store({
   state: {
       isLogin:0,
       userName:'',
-      headState:0,
+      headState:1,
       headStateGoBack:1
   },
   mutations: {
