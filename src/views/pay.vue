@@ -12,16 +12,11 @@
             </li>
         </ul>
         <p @click="Time_Pay">支付</p>
-
-
-<!--        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<!--            <p>价格</p>-->
-<!--            <p>微信支付</p>-->
-<!--            <div @click="Time_Pay">支付</div>-->
     </div>
 </template>
 
 <script>
+    import {mapState,mapGetters,mapMutations,mapActions} from 'vuex';
     export default {
         name: "pay",
         data:function () {
@@ -31,63 +26,55 @@
                 Title:''
             }
         },
+        computed:{...mapState(['userName'])},
         mounted() {
-            this.$store.state.headState=0
+            this.ChangeState({name:'headState',value:0})
         },
         methods:{
+            ...mapMutations(['ChangeState']),
             ToOr:function(){
               event.currentTarget.style['border']='1px solid  #f63'
             },
-            ToCheck:function()
-            {
-                var cookie=document.cookie?document.cookie.split('=')[1]:0
-                console.log(document.cookie)
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'3',token:cookie
-                    },
-                    fn:(res)=>{
-                        console.log('返回的值：'+res.data)
-                        res.data!='false'
-                            ?(console.log('检验成功'),this.$store.state.isLogin=1,this.$store.state.userName=res.data)
-                            :(console.log('检验失败'))
-                    },
-                    type:'post'
-                })
-            },
             //直接支付
             ToPay:function () {
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'7',user:this.$store.state.userName
-                    },
-                    fn:(res)=>{
-                        console.log('返回的值：'+res.data)
-                        if(Number(res.data)===1)
-                        {
-                            this.$router.push('/PersonalMsg')
-                        }
-                    },
-                    type:'post'
+                this.$axios({
+                    method:'post',
+                    url:'http://127.0.0.1:8083/public',
+                    data:{code:'7',user:this.userName}
+                }).then(res=>{
+                    if(Number(res.data)===1)
+                    {
+                        this.$router.push('/PersonalMsg')
+                    }
                 })
+                // this.$store.commit('awsl',{
+                //     mapping: 'http://10.3.131.41:8083/public',
+                //     data:{
+                //         code:'7',user:this.$store.state.userName
+                //     },
+                //     fn:(res)=>{
+                //         console.log('返回的值：'+res.data)
+                //         if(Number(res.data)===1)
+                //         {
+                //             this.$router.push('/PersonalMsg')
+                //         }
+                //     },
+                //     type:'post'
+                // })
             },
             //事后支付
             ToPay2:function () {
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'8',user:this.$store.state.userName,OrderID:this.$route.params.OrderID
-                    },
-                    fn:(res)=>{
-                        console.log('返回的值：'+res.data)
-                        if(Number(res.data)===1)
-                        {
-                            this.$router.push('/PersonalMsg')
-                        }
-                    },
-                    type:'post'
+                console.log(666,this.userName,this.$route.params.OrderID)
+                this.$axios({
+                    method:'post',
+                    url:'http://127.0.0.1:8083/public',
+                    data:{code:'8',user:this.userName,OrderID:this.$route.params.OrderID}
+                }).then(res=>{
+                    console.log(res)
+                    if(Number(res.data)===1)
+                    {
+                        this.$router.push('/PersonalMsg')
+                    }
                 })
             },
             ToPerMsg:function () {
@@ -112,12 +99,10 @@
                 this.Time_Pay=this.ToPay2;
                 this.Price=this.$route.params.price;
                 this.Title=this.$route.params.title;
-                console.log(this.$route.params.price,this.$route.params.title)
             }
-            this.ToCheck()
         },
         destroyed() {
-            this.$store.state.headState=1
+            this.ChangeState({name:'headState',value:1})
         }
     }
 </script>

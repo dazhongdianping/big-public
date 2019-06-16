@@ -69,9 +69,10 @@
   import "../assets/base.css";
   import loginheader from "@/components/loginheader.vue";
   import LoginPop from "@/components/LoginPop.vue";
+  import {mapState,mapGetters,mapMutations,mapActions} from 'vuex';
   export default {
     name: "login",
-    data() {
+    data:function(){
       return {
         title: "手机号快捷登录",
         phonenum: "",    //输入号码
@@ -89,7 +90,8 @@
       this.he = document.body.offsetHeight + 'px'
     },
     methods: {
-      gos() {
+      ...mapMutations(['ChangeState']),
+      gos:function (){
         this.$router.push("/Logins");
       },
      // 验证手机号
@@ -132,30 +134,29 @@
         // }
       },
       // 登录跳转
-      loggo() {
-        // if(this.yanzhengma == '12345' && this.phonesuccess == 1){
-        //   this.$router.push("/");
-        // }else{
-        //   this.$children[1].success = 1;
-        //   this.$children[1].successmsg = '请输入正确的手机号或验证码';
-        // }
-        this.$store.commit('awsl', {
-          mapping: 'http://10.3.131.41:8083/public',
-          data: {code:1,user:this.$refs.mobileNum.value},
-          fn: (res) => {
-            console.log(res.data)
-            res.data==0
-                    ?(this.$router.push({name:'TakeMsg',params:{phonenum:this.$refs.mobileNum.value}}))
-                    :(this.$router.push('/PersonalMsg'));
-          },
-          type: 'post'
+      loggo:function(){
+        this.$axios({
+          method: 'post',
+          url:'http://127.0.0.1:8083/public',
+          data:{code:1,user:this.$refs.mobileNum.value},
+        }).then(res=>{
+          if( Number(res.data)===0)
+          {
+            console.log('跳转注册',res.data)
+            this.$router.push({name:'TakeMsg', params:{phonenum:this.$refs.mobileNum.value}})
+          }else{
+            console.log('登录成功')
+            let re=JSON.parse(res.data)
+            var timer = new Date();
+            timer.setDate(timer.getDate()+7);
+            this.$Cookie.setCookie('Token',re.token,timer,'/')
+            this.$router.push('/PersonalMsg')
+          }
         })
+
       }
     },
-    components: {
-      loginheader,
-      LoginPop
-    }
+    components: {loginheader, LoginPop}
   };
 </script>
 <style scoped>

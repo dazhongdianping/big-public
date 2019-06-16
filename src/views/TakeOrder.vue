@@ -5,22 +5,17 @@
             <label>提交订单</label>
         </header>
         <p>{{goods.Title}}</p>
-        <p><span>数量</span><el-input-number  size="mini" v-model="num" @change="handleChange" :min="1" :max="10" label="描述文字"></el-input-number></p>
+        <p><span>数量</span><el-input-number  size="mini" v-model="num"  :min="1" :max="10" label="描述文字"></el-input-number></p>
         <p><span>小计</span><span>￥{{goods.price*num}}</span></p>
         <p><input type="text" placeholder="现金券/抵用券/优惠码"></p>
         <p><span>手机号码</span><span>13047071121</span></p>
         <p @click="Pay">提交订单</p>
-
-<!--        <p>提交订单</p>-->
-<!--        <p>{{goods.Title}}|{{goods.place}}</p>-->
-<!--        <label>数量</label> <input type="text" style="border: 1px solid black"  v-model="num"><br>-->
-<!--        <p>总价:{{goods.price*num}}</p>-->
-<!--        <div @click="Pay">提交订单</div>-->
     </div>
-<!--    <a href="javascript:history.back(-1)">返回</a>-->
+
 </template>
 
 <script>
+    import {mapState,mapGetters,mapMutations,mapActions} from 'vuex';
     export default {
         name: "TakeOrder",
         data:function () {
@@ -29,80 +24,51 @@
                     num:1,
             }
         },
+        computed:{...mapState(['userName'])},
         mounted() {
-            this.$store.state.headState=0
+            this.ChangeState({name:'headState',value:0})
         },
         created(){
-            this.ToCheck();
             this.GetGoodsById(this.$route.params.id)
         },
         methods:{
-            //Token检验
-            ToCheck:function()
-            {
-                var cookie=document.cookie?document.cookie.split('=')[1]:0
-                console.log(document.cookie)
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'3',token:cookie
-                    },
-                    fn:(res)=>{
-                        console.log('返回的值：'+res.data)
-                        res.data!='false'
-                            ?(console.log('检验成功'),this.$store.state.isLogin=1,this.$store.state.userName=res.data)
-                            :(console.log('检验失败'))
-                    },
-                    type:'post'
-                })
-            },
+            ...mapMutations(['ChangeState']),
             //获取准订单信息
             GetGoodsById:function (id) {
-                this.$store.commit("awsl", {
-                    mapping:
-                        "https://www.easy-mock.com/mock/5cfdc08102fa400c0876ef52/jousen/GoodsMsg",
-                    type: "get",
-                    fn:(res)=> {
-                        let data = res.data.data;
-                        data.forEach(item => {
-                            if (item.id == id) {
-                                this.goods=item;return
-                            }
-                        })
-                        console.log(this.goods)
-                    }
+                this.$axios({
+                    method:'get',
+                    url:'https://www.easy-mock.com/mock/5cfdc08102fa400c0876ef52/jousen/GoodsMsg'
+                }).then(res=>{
+                    let data = res.data.data;
+                    data.forEach(item => {
+                        if (Number(item.id)=== Number(id)) {
+                            this.goods=item;return true
+                        }
+                    })
                 })
             },
             //生成订单，状态未付款
             Pay:function () {
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'6',id:this.$route.params.id,num:this.num,user:this.$store.state.userName
-                    },
-                    fn:(res)=>{
-                        console.log('返回的值：'+res.data)
-                        if(Number(res.data)===1){
-                            console.log('操作成功')
-                            this.$router.push({name:'pay',params:{state:'1',price:this.goods.price*this.num,title:this.goods.Title}})   //1代表付款状态
-                        }else{
-                            console.log("操作失败")
-                        }
-
-                    },
-                    type:'post'
+                this.$axios({
+                    method:'post',
+                    url:'http://127.0.0.1:8083/public',
+                    data:{ code:'6',id:this.$route.params.id,num:this.num,user:this.userName}
+                }).then(res=>{
+                    if(Number(res.data)===1){
+                        console.log('操作成功')
+                        this.$router.push({name:'pay',params:{state:'1',price:this.goods.price*this.num,title:this.goods.Title}})   //1代表付款状态
+                    }else{
+                         window.alert("操作失败")
+                    }
                 })
             },
             ToDetail:function () {
-
+                    this.$router.push(`/details/${this.$route.params.id}`)
             },
-            handleChange:function(value) {
-                // console.log(value);
-            }
         },
         destroyed()
         {
-            this.$store.state.headState=1
+            this.ChangeState({name:'headState',value:1})
         }
 
     }

@@ -7,8 +7,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-      isLogin:0,
-      userName:'',
+      isLogin:false,
+      token:null,
+      userName:null,
       headState:1,
       headStateGoBack:1
   },
@@ -26,8 +27,20 @@ export default new Vuex.Store({
         console.log(err)
       })
     },
+    ChangeState:function (state,config) {
+      console.log(config.name,config.value)
+      state[config.name]=config.value
+    },
   },
   actions: {
 
-  }
+  },
+  getters: {
+    /**
+     * @return {boolean}
+     */
+    getToken(state) {return state.token}
+    ,
+    LoginMeg(state) {return state.isLogin;}
+  },
 })

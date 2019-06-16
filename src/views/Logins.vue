@@ -9,19 +9,19 @@
               <span class="EasyLogin-country-code" data-code="86">86</span>
               <div class="EasyLogin_Mobile_Arrow"></div>
             </div>
-            <input type="number" data-name="username" placeholder="手机号" v-model="shoujihao" ref="user">
+            <input type="number" data-name="username" placeholder="手机号" ref="user">
           </div>
           <div class="EasyLogin_row">
             <div class="EasyLogin_Mobile_tit">密码</div>
-            <input type="password" data-name="password" placeholder="密码" v-model="mima" ref="pass">
+            <input type="password" data-name="password" placeholder="密码" ref="pass">
           </div>
         </div>
       </div>
     </div>
     <div class="form-button">
-      <a id="login-button" href="javascript:;" class="login" @click="logingo">登录</a>
+      <a id="login-button" href="javascript:;" class="login" @click="Login">登录</a>
       <div class="extra forgot-password">
-        <a href="/resetpassword?redir=https%3A%2F%2Fm.dianping.com%2Fnmy%2Fmyinfo">忘记密码？</a>
+        <a>忘记密码？</a>
       </div>
     </div>
     <LoginPop/>
@@ -30,13 +30,12 @@
 <script>
   import loginheader from "@/components/loginheader.vue";
   import LoginPop from "@/components/LoginPop.vue";
+  import {mapState,mapGetters,mapMutations,mapActions} from 'vuex';
   export default {
     name: "logins",
     data() {
       return {
         title: "账号密码登录",
-        shoujihao: "",
-        mima: "",
         he:''
       };
     },
@@ -44,49 +43,31 @@
       this.he = document.body.offsetHeight + 'px'
     },
     methods: {
-      logingo() {
-        console.log(666)
-        this.$store.commit('awsl',{
-          mapping: 'http://10.3.131.41:8083/public',
+      ...mapMutations(['ChangeState']),
+      Login:function(){
+        this.$axios({
+          method: 'post',
+          url: 'http://127.0.0.1:8083/public',
           data:{
             code:'4',user:this.$refs.user.value,pass:this.$refs.pass.value
-          },
-          fn:(res)=>{
-            console.log('返回的值：'+res.data)
-            if(res.data!='false')
-            {
-              console.log("登录成功")
-              this.$store.state.isLogin=1;
-              this.$store.state.userName=res.data
-              var d = new Date();
-              d.setDate(d.getDate()+7);
-              document.cookie='Token='+res.data+ ';expires='+d.toUTCString()+';path=/';
-              this.$router.push('/PersonalMsg');
-
-            }
-            else
-            {
-              console.log("登录失败")
-            }
-          },
-          type:'post'
+          }
+        }).then(res=>{
+           if(Number(res.data)!==0)
+           {
+             let re=JSON.parse(res.data)
+             var timer = new Date();
+             timer.setDate(timer.getDate()+7);
+             this.$Cookie.setCookie('Token',re.token,timer,'/')
+             this.$router.push('/PersonalMsg')
+           }
+           else{
+             console.log('用户密码错误')
+             window.alert('用户密码错误')
+           }
         })
-        // this.$http.get('https://www.apiopen.top/login?key=00d91e8e0cca2b76f515926a36db68f5&phone='+ this.shoujihao +'&passwd=' + this.mima).then(res => {
-        //   if(res.body.data){
-        //     this.$router.push("/");
-        //   }else{
-        //     this.$children[1].success = 1;
-        //     this.$children[1].successmsg = '密码错误，请重新输入并注意大小写。 推荐您使用“手机号快捷登录”！';
-        //   }
-        // },function(){
-        //   console.log('请求失败处理');
-        // });
       },
     },
-    components: {
-      loginheader,
-      LoginPop
-    }
+    components: {loginheader, LoginPop}
   };
 </script>
 <style scoped>

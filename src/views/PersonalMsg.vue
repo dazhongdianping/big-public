@@ -6,8 +6,8 @@
             <span @click="ToCancellation">注销</span>
         </header>
         <nav>
-            <ul>
-                <li @click="ToGetList($store.state.userName)">全部订单</li>
+            <ul ref="nav">
+                <li @click="ToGetList(userName)">全部订单</li>
                 <li @click="ShowUnpaid">待付款</li>
                 <li>可使用</li>
                 <li>退款/售后</li>
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+    import {mapState,mapGetters,mapMutations,mapActions} from 'vuex';
     export default {
         name: "PersonalMsg",
         data:function () {
@@ -39,79 +40,66 @@
                 user:''
             }
         },
+        computed:{
+          ...mapState(['userName'])
+        },
         filters:{
+            /**
+             * @return {string}
+             */
             Astate:function(value) {
-                if (value==1) return "已付款"
+                if (Number(value)===1) return "已付款"
                 return '未付款'
             },
+            /**
+             * @return {string}
+             */
             Tocolor:function (value) {
-                if (value==1) return "red"
+                if (Number(value)===1) return "red"
                 return 'black'
             }
         },
         mounted() {
-            this.$store.state.headState=0
+            this.ChangeState({name:'headState',value:0})
+            this.ToChangeColor();
         },
         created(){
-            this.ToCheck();
+            this.ToGetList(this.userName)
         },
         methods:{
+            ...mapMutations(['ChangeState']),
             ToHome:function () {
                 this.$router.push('/')
             },
             //注销
             ToCancellation:function () {
                 this.$cookie.removeCookie('Token','/')
-                this.$store.state.isLogin=0,this.$store.state.userName=''
+                this.ChangeState({name:'isLogin',value:false})
+                this.ChangeState({name:'userName',value:null})
+                this.ChangeState({name:'token',value:null})
                 this.$router.push('/Logins')
-            },
-            //Token检验
-            ToCheck:function()
-            {
-                var cookie=document.cookie?document.cookie.split('=')[1]:0
-                console.log(document.cookie)
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'3',token:cookie
-                    },
-                    fn:(res)=>{
-                        console.log('返回的值：'+res.data)
-                        res.data!='false'
-                            ?(console.log('检验成功'),this.$store.state.isLogin=1,this.$store.state.userName=res.data,this.ToGetList(res.data))
-                            :(console.log('检验失败'))
-                    },
-                    type:'post'
-                })
             },
             //获取订单列表
             ToGetList:function (user) {
-                this.$store.commit('awsl',{
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data:{
-                        code:'5',user:user
-                    },
-                    fn:(res)=>{
-                       // console.log('返回的值：'+res.data)
-                        let data=JSON.parse(res.data)
-                        this.userData=res.data;
-                       // console.log( this.userData)
-                        this.GetGoodsData(data);
-                    },
-                    type:'post'
+                this.$axios({
+                    method:'post',
+                    url:'http://127.0.0.1:8083/public',
+                    data:{code:'5',user:user}
+                }).then(res=>{
+                    let data=JSON.parse(res.data)
+                    this.GetGoodsData(data);
                 })
             },
             //获取商品数据
             GetGoodsData: function (data) {
-                this.$store.commit('awsl', {
-                    mapping: 'https://www.easy-mock.com/mock/5cfdc08102fa400c0876ef52/jousen/DZDPlist',
-                    data: {},
-                    fn: (res) => {
-                        this.List=[];
-                        console.log(  res.data.data)
-                        data.forEach(function (item) {
-                            res.data.data.forEach(function (em) {
-                                if(em.id==item.id)
+                this.$axios({
+                    method:'get',
+                    url:'https://www.easy-mock.com/mock/5cfdc08102fa400c0876ef52/jousen/DZDPlist',
+                }).then(res=>{
+                    this.List=[];//清空列表
+                    data.forEach(item=>{
+                        res.data.data.forEach(em=>{
+                                if(Number(em.id)===Number(item.id))
                                 {
                                     this.List.push({
                                         title:em.title,
@@ -122,29 +110,16 @@
                                         state:item.state,
                                         order:item.order,
                                         price:em.nowprice,
-                                    })
-                                  //  console.log(em);
-                                    return
+                                    }); return false
                                 }
-                            }.bind(this))
-                        }.bind(this))
-                      //  console.log(this.List)
-                        // res.data.data.forEach(function (item) {
-                        //     if(item.id==data[0].id)
-                        //     {
-                        //         console.log(item);return
-                        //     }
-                        // })
-                    },
-                    type: 'get'
+                        })
+                    })
                 })
             },
             //显示未付款订单
             ShowUnpaid:function () {
-                console.log(666)
-                this.List=this.List.filter(function (item,index) {
-                    console.log(index)
-                      return item.state==0
+                this.List=this.List.filter(function (item) {
+                      return Number(item.state)===0
                 })
             },
             //未付款去支付，已付款去了解详情
@@ -156,11 +131,21 @@
               }else{
                   console.log('已付款')
               }
+            },
+            ToChangeColor:function () {
+                this.$refs.nav.onclick=function (e) {
+                    Array.from(e.currentTarget.children).forEach(item=>{
+                        if(e.target===item) {
+                            item.style.borderBottom='2px solid #f63';
+                            return;}
+                        item.style.borderBottom='2px solid #fff'
+                    })
+                }
             }
 
         },
         destroyed() {
-            this.$store.state.headState=1
+            this.ChangeState({name:'headState',value:1})
         }
     }
 </script>

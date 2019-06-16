@@ -8,21 +8,18 @@
 <script>
     export default {
         name: "Msg",
-        mounted() {
-            console.log(this.$route.params.phonenum)
-        },
         methods:{
             ToRegister:function () {
-                this.$store.commit('awsl', {
-                    mapping: 'http://10.3.131.41:8083/public',
-                    data: {code:2,phoneNum:this.$route.params.phonenum,pass:this.$refs.pass.value},
-                    fn: (res) => {
-                        var d = new Date();
-                        d.setDate(d.getDate()+7);
-                        document.cookie='Token='+res.data+ ';expires='+d.toUTCString()+';path=/';
-                        this.$router.push('/PersonalMsg');
-                    },
-                    type: 'post'
+                this.$axios({
+                    method:'post',
+                    url:'http://127.0.0.1:8083/public',
+                    data:{code:2,phoneNum:this.$route.params.phonenum,pass:this.$refs.pass.value},
+                }).then(res=>{
+                    console.log(res)
+                    var d = new Date();
+                    d.setDate(d.getDate()+7);
+                    this.$Cookie.setCookie('Token',res.data,d,'/')
+                    this.$router.push('/');
                 })
             }
         },

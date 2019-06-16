@@ -8,20 +8,16 @@
   </div>
 </template>
 <script>
+  import {mapState,mapGetters,mapMutations,mapActions} from 'vuex'
   export default {
     name:'app',
-    data(){
-      return{
-      }
-    },
     methods:{
       ToPersonMsg:function () {
-
         this.$store.state.isLogin?(this.$router.push('/PersonalMsg')):(this.$router.push('/login'))
-      }
-    },
-    mounted() {
+      },
+      ...mapMutations([
 
+      ])
     },
   }
 </script>

@@ -66,6 +66,7 @@ import bulkDetails from "@/components/BulkDetails";
 import buyKnow from "@/components/BuyKnow";
 import otherBulk from "@/components/OtherBulk";
 import lookGoods from "@/components/LookGoods";
+import {mapMutations} from 'vuex';
 export default {
   name: "",
   data() {
@@ -82,51 +83,44 @@ export default {
   },
   created() {
     this.getDetails();
-    this.$store.state.headState=0
   },
   mounted(){
-    window.scrollTo(0,0);
+    this.ChangeState({name:'headState',value:0})
+      window.scrollTo(0,0);
   },
   methods: {
-    getDetails:function () {
-      let that = this;
-      this.$store.commit("awsl", {
-        mapping:
-          "https://www.easy-mock.com/mock/5cfdc08102fa400c0876ef52/jousen/GoodsMsg",
-        type: "get",
-        fn(res) {
-          let data = res.data.data;
-          data.forEach(item => {
-            if (item.id == that.$route.params.id) {
-              that.goodsMsg = item;return
-            }
-          })
-
-    }
-    })
+    ...mapMutations(['ChangeState']),
+    getDetails:function (){
+      this.$axios({
+        method: 'get',
+        url:'https://www.easy-mock.com/mock/5cfdc08102fa400c0876ef52/jousen/GoodsMsg'
+      }).then(res=>{
+        let data = res.data.data;
+        data.forEach(item => {
+          if (Number(item.id) === Number(this.$route.params.id)) {
+            this.goodsMsg = item;return
+          }
+        })
+      })
   },
     ToBuy:function () {
-      console.log(666)
-       let goodsId=this.$route.params.id;
-       this.$router.push({name:'TakeOrder',params:{id:goodsId}})
+       this.$router.push({name:'TakeOrder',params:{id:this.$route.params.id}})
     },
     ToHome:function () {
       this.$router.push('/')
     }
   },
   destroyed() {
-    this.$store.state.headState=1
+    this.ChangeState({name:'headState',value:1})
   }
 }
 
 </script>
 
 <style lang='scss' scoped>
-
   /*~~~~~~~~~~~~~~~~~~*/
   header{
-
-    width: 100%;
+    width: calc(100% - 20px);
     height:50px ;
     background:  #f0f0f0;;;
     padding-left: 10px;
